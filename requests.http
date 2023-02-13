@@ -1,4 +1,22 @@
 
+@endpoint = https://ds1n99lv4a.execute-api.us-east-1.amazonaws.com/prod/
 
-GET https://udq317fn57.execute-api.us-east-1.amazonaws.com/prod/hello
+GET {{endpoint}}/device
+###
+
+POST {{endpoint}}/device
+Content-Type: application/json
+Accept: application/json
+
+{
+        "body":{
+            "factoryName":"Wilmington",
+            "deviceType":"Vida",
+            "deviceClass":"3DPrinter",
+            "status":"online",
+            "ipAddress":"192.168.3.5",
+            "name":"Printer-1",
+        }
+}
+
 ###
