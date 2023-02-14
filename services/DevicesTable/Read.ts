@@ -24,8 +24,9 @@ const handler = async (
 		const items = queryResp.Items?.map((item) =>
 			mapDynamoDBItemToResponse(item as DBEntry)
 		)
+		const finalItems = items?.filter((item) => item)
 		console.log('DB items', items)
-		result.body = JSON.stringify(items)
+		result.body = JSON.stringify(finalItems)
 	} catch (error) {}
 	return result
 }

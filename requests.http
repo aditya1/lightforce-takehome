@@ -9,14 +9,28 @@ Content-Type: application/json
 Accept: application/json
 
 {
-        "body":{
-            "factoryName":"Wilmington",
-            "deviceType":"Vida",
-            "deviceClass":"3DPrinter",
-            "status":"online",
-            "ipAddress":"192.168.3.5",
-            "name":"Printer-1",
-        }
+    "factoryName":"Wilmington",
+    "deviceType":"Furnace",
+    "deviceClass":"Furnace",
+    "status":"online",
+    "ipAddress":"192.168.3.9",
+    "name":"Furnace-123"
+}
+
+###
+
+DELETE {{endpoint}}/device/720bb7bf-33ef-4a3b-9fc3-7104de7c63c6
+
+###
+
+PUT {{endpoint}}/device/2c5f41cc-33a9-427a-8d65-3f5c6668f967
+Content-Type: application/json
+Accept: application/json
+
+{
+    "deviceAttributes":{
+        "maxTemp":"1000C"
+    }
 }
 
 ###

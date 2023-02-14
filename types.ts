@@ -9,18 +9,20 @@ export interface DBEntry {
 	deviceAttributes?: Object
 	createdAt: number
 	deletedAt?: number
+	updatedAt?: number
 }
 
 export interface WSBody {
 	factoryName: string
-	deviceType: string
-	deviceClass: string
-	status: string
-	ipAddress: string
-	name: string
+	deviceType?: string
+	deviceClass?: string
+	status?: string
+	ipAddress?: string
+	name?: string
 	deviceAttributes?: Object
 }
 
 export interface WSResp extends WSBody {
 	id: string
+	updatedAt?: string
 }

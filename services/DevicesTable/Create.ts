@@ -35,19 +35,19 @@ const handler = async (
 	const item: DBEntry = {
 		pk: wsBody.factoryName,
 		sk: `${v4()}::${wsBody.ipAddress}`,
-		deviceClass: wsBody.deviceClass,
-		deviceType: wsBody.deviceType,
-		name: wsBody.name,
-		status: wsBody.status,
-		deviceAttributes: wsBody.deviceAttributes,
+		deviceClass: wsBody.deviceClass ?? '',
+		deviceType: wsBody.deviceType ?? '',
+		name: wsBody.name ?? '',
+		status: wsBody.status ?? '',
+		deviceAttributes: wsBody.deviceAttributes ?? '',
 		createdAt: Date.now(),
-		factoryName: wsBody.factoryName,
+		factoryName: wsBody.factoryName ?? '',
 	}
 	const ipAddress = wsBody.ipAddress
 	const params = {
 		TableName: TABLE_NAME!,
 		FilterExpression:
-			'contains(pk,:pkSearchString) and contains(sk, :searchString) ',
+			'contains(pk,:pkSearchString) and contains(sk, :searchString)',
 		ExpressionAttributeValues: {
 			':searchString': ipAddress,
 			':pkSearchString': wsBody.factoryName,

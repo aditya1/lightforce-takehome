@@ -82,10 +82,10 @@ export class GenericTable {
 			this.table.grantReadData(this.readLambda)
 		}
 		if (this.updateLambda) {
-			this.table.grantWriteData(this.updateLambda)
+			this.table.grantReadWriteData(this.updateLambda)
 		}
 		if (this.deleteLambda) {
-			this.table.grantWriteData(this.deleteLambda)
+			this.table.grantReadWriteData(this.deleteLambda)
 		}
 	}
 	private createSingleLambda(lambdaName: string): NodejsFunction {

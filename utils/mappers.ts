@@ -11,19 +11,22 @@ const mapDynamoDBItemToResponse = (item: DBEntry): WSResp | undefined => {
 		deviceClass,
 		deviceAttributes,
 		factoryName,
+		updatedAt,
 	} = item
 	const tokens = sk.split('::')
 	if (tokens.length !== 2) return undefined
 	if (deletedAt) return undefined
+
 	return {
 		factoryName,
 		deviceClass,
 		deviceType,
-		id: sk[0],
-		ipAddress: sk[1],
+		id: tokens[0],
+		ipAddress: tokens[1],
 		name,
 		status,
 		deviceAttributes,
+		updatedAt: updatedAt ? new Date(updatedAt).toLocaleString() : undefined,
 	}
 }
 

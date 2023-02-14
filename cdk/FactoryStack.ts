@@ -17,26 +17,30 @@ export class FactoryStack extends Stack {
 		sortKey: 'sk',
 		createLambdaPath: 'Create',
 		readLambdaPath: 'Read',
+		deleteLambdaPath: 'Delete',
+		updateLambdaPath: 'Update',
 	})
 
 	constructor(scope: Construct, id: string, props: StackProps) {
 		super(scope, id, props)
-		const deviceLambda = new NodejsFunction(this, 'deviceLambda', {
-			runtime: Runtime.NODEJS_14_X,
-			entry: join(
-				join(__dirname, '..', 'services', 'DevicesTable', 'getDevices.ts')
-			),
-			handler: 'handler',
-			functionName: 'deviceLambda',
-		})
-
-		// Hello Api lambda integration:
-		const deviceLambdaIntegration = new LambdaIntegration(deviceLambda, {
-			allowTestInvoke: true,
-		})
 
 		const factoryResource = this.api.root.addResource('device')
 		factoryResource.addMethod('GET', this.spacesTable.readLambdaIntegration)
 		factoryResource.addMethod('POST', this.spacesTable.createLambdaIntegration)
+		const deleteResource = factoryResource.addResource('{id}')
+		deleteResource.addMethod(
+			'DELETE',
+			this.spacesTable.deleteLambdaIntegration,
+			{
+				requestParameters: {
+					'method.request.path.id': true,
+				},
+			}
+		)
+		deleteResource.addMethod('PUT', this.spacesTable.updateLambdaIntegration, {
+			requestParameters: {
+				'method.request.path.id': true,
+			},
+		})
 	}
 }
