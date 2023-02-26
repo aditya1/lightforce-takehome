@@ -13,8 +13,8 @@ Accept: application/json
     "deviceType":"Furnace",
     "deviceClass":"Furnace",
     "status":"online",
-    "ipAddress":"192.168.3.9",
-    "name":"Furnace-123"
+    "ipAddress":"192.168.30.9",
+    "name":"Furnace-456"
 }
 
 ###

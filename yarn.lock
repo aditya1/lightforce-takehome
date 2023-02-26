@@ -795,6 +795,13 @@
   resolved "https://registry.yarnpkg.com/@middy/error-logger/-/error-logger-3.6.2.tgz#dcb37d9d5beb1a5e988af288f24c28e495ab4bd8"
   integrity sha512-7pGHuYWbBHsowtb+s4IDkfackp/kNe/iDTdqMzV8RoFfa+w3Oljre54fVquLVMe9+O98mA/woXYPJtv4MGVnUw==
 
+"@middy/http-error-handler@^4.2.6":
+  version "4.2.6"
+  resolved "https://registry.yarnpkg.com/@middy/http-error-handler/-/http-error-handler-4.2.6.tgz#3922f698e53f5bea45313922888990b079308099"
+  integrity sha512-S7l6dc4Jkpidd3etVjmKWGDe8KZKV9dnL/KeqU5nrTtrOfya551IM5RrDy1yI1Ivxu0UT/ONlSV35hdEOeBwTw==
+  dependencies:
+    "@middy/util" "4.2.6"
+
 "@middy/http-header-normalizer@^3.6.2":
   version "3.6.2"
   resolved "https://registry.yarnpkg.com/@middy/http-header-normalizer/-/http-header-normalizer-3.6.2.tgz#fec29d2c97a7b42e2d3ae191c191a1fd435b41ed"
@@ -818,6 +825,11 @@
   version "3.6.2"
   resolved "https://registry.yarnpkg.com/@middy/util/-/util-3.6.2.tgz#2d49a4f9b6ab7fe3635b1123cfcfe35892743e5c"
   integrity sha512-zjyjF5BdSNnDlZbTvfQwwuUIs3H5PpN/R3wOAipXhaGD/SjpIUBcJJPLUQHySeHoZym1FC3MJYczJDbYQWKWdg==
+
+"@middy/util@4.2.6":
+  version "4.2.6"
+  resolved "https://registry.yarnpkg.com/@middy/util/-/util-4.2.6.tgz#c20d486c3ea3c32943a49ec09f5e86830fab5bbe"
+  integrity sha512-TxsWUBYxwBNeFO/AK0Ouk3ESqXYMWkeasRNs7kM/wDcz4pPnqEy4SyF9CQsRsrDv0irKsVgxKYpVms5SabSUvg==
 
 "@middy/validator@^3.6.2":
   version "3.6.2"

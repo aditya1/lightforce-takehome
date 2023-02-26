@@ -20,6 +20,7 @@ const handler = async (
 		body: 'Hello from DynamoDb',
 	}
 	try {
+		//It gets all of the entries from DynamoDB table
 		const queryResp = await dbClient.scan({ TableName: TABLE_NAME! }).promise()
 		const items = queryResp.Items?.map((item) =>
 			mapDynamoDBItemToResponse(item as DBEntry)

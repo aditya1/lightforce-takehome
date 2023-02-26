@@ -73,6 +73,7 @@ export class GenericTable {
 		}
 	}
 
+	//This function grants writes to the DynamoDBTable
 	private grantTableRights() {
 		if (this.createLambda) {
 			this.table.grantWriteData(this.createLambda)
@@ -88,6 +89,7 @@ export class GenericTable {
 			this.table.grantReadWriteData(this.deleteLambda)
 		}
 	}
+	//This defines NodeJS based Lambda fucntion
 	private createSingleLambda(lambdaName: string): NodejsFunction {
 		const lambdaId = `${this.props.tableName}-${lambdaName}`
 		return new NodejsFunction(this.stack, lambdaId, {

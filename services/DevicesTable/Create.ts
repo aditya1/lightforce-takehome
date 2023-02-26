@@ -1,49 +1,38 @@
 import { DynamoDB, CloudWatch } from 'aws-sdk'
 import middy from '@middy/core'
 import validator from '@middy/validator'
-import httpJsonBodyParser from '@middy/http-json-body-parser'
-import httpHeaderNormalizer from '@middy/http-header-normalizer'
-import cloudWatchMetricsMiddleware from '@middy/cloudwatch-metrics'
-import errorLoggerMiddleware from '@middy/error-logger'
-import inputOutputLoggerMiddleware from '@middy/input-output-logger'
+import jsonBodyParser from '@middy/http-json-body-parser'
+import httpErrorHandler from '@middy/http-error-handler'
 
 import { DBEntry, WSBody } from '../../types'
 
-import {
-	APIGatewayProxyEvent,
-	APIGatewayProxyResult,
-	Context,
-} from 'aws-lambda'
+import { APIGatewayProxyResult, Context } from 'aws-lambda'
 import { v4 } from 'uuid'
 
 const TABLE_NAME = process.env.TABLE_NAME
 const dbClient = new DynamoDB.DocumentClient()
 
 const handler = async (
-	event: APIGatewayProxyEvent,
-	contex: Context
+	event: any,
+	context: Context
 ): Promise<APIGatewayProxyResult> => {
 	const result: APIGatewayProxyResult = {
 		statusCode: 200,
 		body: 'Hello from DynamoDb',
 	}
+	//Prints logs to cloudWatch
 	console.log('Event data is: ', event)
-	const wsBody: WSBody =
-		typeof event.body === 'object' ? event.body : JSON.parse(event.body)
-	console.log('Event body is: ', wsBody)
 
-	const item: DBEntry = {
-		pk: wsBody.factoryName,
-		sk: `${v4()}::${wsBody.ipAddress}`,
-		deviceClass: wsBody.deviceClass ?? '',
-		deviceType: wsBody.deviceType ?? '',
-		name: wsBody.name ?? '',
-		status: wsBody.status ?? '',
-		deviceAttributes: wsBody.deviceAttributes ?? '',
-		createdAt: Date.now(),
-		factoryName: wsBody.factoryName ?? '',
-	}
-	const ipAddress = wsBody.ipAddress
+	const wsBody: WSBody = event.body
+	console.log('Event body is: ', wsBody)
+	const id = v4()
+
+	const { ipAddress, factoryName } = wsBody
+
+	//Following is the expression built for running scan on the dyanmoDB table.
+	//Here we're first trying to find if any device already using the given
+	//IP Address, if we found a device with given IP address then erorr will be returned
+
 	const params = {
 		TableName: TABLE_NAME!,
 		FilterExpression:
@@ -59,14 +48,32 @@ const handler = async (
 		if (scanResp.Count) {
 			console.log('Found items with given IPAddress', scanResp)
 			return {
-				statusCode: 409,
-				body: `Machine already exists with given IPAddress ${ipAddress}, cannot create new one.`,
+				statusCode: 400,
+				body: JSON.stringify({
+					message: `Machine already exists with given IPAddress ${ipAddress} in ${factoryName} 
+					Factory, cannot create new one.`,
+				}),
 			}
 		}
 	} catch (e) {
 		console.error('Error in scanning', e)
 	}
 	try {
+		//This is DB entry which will be added to DynamoDB table
+		//Here pk means Partition Key :- Factory Name is used as partition key
+		//sk means sort key : Combination of deviceId and ipAddress is used as
+		//sort key.
+		const item: DBEntry = {
+			pk: wsBody.factoryName,
+			sk: `${id}::${wsBody.ipAddress}`,
+			deviceClass: wsBody.deviceClass ?? '',
+			deviceType: wsBody.deviceType ?? '',
+			name: wsBody.name ?? '',
+			status: wsBody.status ?? '',
+			deviceAttributes: wsBody.deviceAttributes ?? '',
+			createdAt: Date.now(),
+			factoryName: wsBody.factoryName ?? '',
+		}
 		await dbClient
 			.put({
 				TableName: TABLE_NAME!,
@@ -80,7 +87,11 @@ const handler = async (
 	} catch (error) {
 		throw new Error('Failed to create DynamoDB record')
 	}
-	result.body = JSON.stringify(`Created item with id: ${item.pk}:${item.sk}`)
+	const body = {
+		message: `Created new Device in ${wsBody.factoryName} factory`,
+		deviceId: id,
+	}
+	result.body = JSON.stringify(body)
 	return result
 }
 
@@ -89,6 +100,7 @@ const schema = {
 	properties: {
 		body: {
 			type: 'object',
+			additionalProperties: false,
 			properties: {
 				deviceType: { type: 'string' },
 				deviceClass: { type: 'string' },
@@ -116,14 +128,28 @@ const schema = {
 			],
 		},
 	},
-	required: ['body'],
 }
 
 const handlerWithMiddleware = middy(handler)
-	.use(httpHeaderNormalizer())
-	.use(httpJsonBodyParser())
-	.use(cloudWatchMetricsMiddleware())
-	.use(inputOutputLoggerMiddleware())
-	.use(errorLoggerMiddleware())
+	.use(jsonBodyParser())
+	.use(
+		validator({
+			inputSchema: schema,
+		})
+	)
+	.use({
+		onError: (request) => {
+			const response = request.response
+			const error = <any>request.error
+			if (response.statusCode != 400) return
+			if (!error.expose || !error.cause) return
+			response.headers['Content-Type'] = 'application/json'
+			response.body = JSON.stringify({
+				message: response.body,
+				validationErrors: error.cause,
+			})
+		},
+	})
+	.use(httpErrorHandler())
 
 export { handlerWithMiddleware as handler }

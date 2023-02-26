@@ -2,7 +2,6 @@ import { WSResp, DBEntry } from '../types'
 
 const mapDynamoDBItemToResponse = (item: DBEntry): WSResp | undefined => {
 	const {
-		pk,
 		sk,
 		deviceType,
 		status,
@@ -14,6 +13,8 @@ const mapDynamoDBItemToResponse = (item: DBEntry): WSResp | undefined => {
 		updatedAt,
 	} = item
 	const tokens = sk.split('::')
+	//Makes sure the DB entry contains IP Address as well as Device ID
+	//If not then that entry will not be considered valid.
 	if (tokens.length !== 2) return undefined
 	if (deletedAt) return undefined
 
